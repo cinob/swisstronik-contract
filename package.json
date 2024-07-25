@@ -4,7 +4,9 @@
     "deploy": "hardhat run scripts/deploy.js --network swisstronik",
     "set": "hardhat run scripts/setMessage.js --network swisstronik",
     "get": "hardhat run scripts/getMessage.js --network swisstronik",
-    "mint": "hardhat run scripts/mint.js --network swisstronik"
+    "mint": "hardhat run scripts/mint.js --network swisstronik",
+    "total": "hardhat run scripts/totalSupply.js --network swisstronik",
+    "transfer": "hardhat run scripts/transfer.js --network swisstronik"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
