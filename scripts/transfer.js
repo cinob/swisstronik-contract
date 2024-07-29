@@ -17,15 +17,17 @@ async function main() {
   const [signer] = await hre.ethers.getSigners();
   const contractFactory = await hre.ethers.getContractFactory("TESTNFT");
   const contract = contractFactory.attach(contractAddress);
-  const functionName = "mint100tokens";
-  const mint100TokensTx = await sendShieldedTransaction(
+  const functionName = "transfer";
+  const amount = 1 * 10 ** 18;
+  const functionArgs = ["0x16af037878a6cAce2Ea29d39A3757aC2F6F7aac1", amount.toString()];
+  const transaction = await sendShieldedTransaction(
     signer,
     contractAddress,
-    contract.interface.encodeFunctionData(functionName),
+    contract.interface.encodeFunctionData(functionName, functionArgs),
     0
   );
-  await mint100TokensTx.wait();
-  console.log("Transaction Receipt: ", `Minting token has been success! Transaction hash: https://explorer-evm.testnet.swisstronik.com/tx/${mint100TokensTx.hash}`);
+  await transaction.wait();
+  console.log("Transaction Response: ", `Transfer token has been success! Transaction hash: https://explorer-evm.testnet.swisstronik.com/tx/${transaction.hash}`);
 }
 
 main().catch((error) => {
