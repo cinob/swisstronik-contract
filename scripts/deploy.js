@@ -1,16 +1,18 @@
 const hre = require("hardhat");
+// const fs = require("fs");
 
 async function main() {
-  const contract = await hre.ethers.deployContract("Swisstronik", ["Hello Swisstronik!!"]);
+  const contract = await hre.ethers.deployContract("TestNFT");
 
   await contract.waitForDeployment();
 
-  console.log(`Swisstronik contract deployed to ${contract.target}`);
+  const deployContract = await contract.getAddress();
+
+  //   fs.writeFileSync("contract.txt", deployContract);
+
+  console.log(`deployed to ${deployContract}`);
 }
 
-//DEFAULT BY HARDHAT:
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
