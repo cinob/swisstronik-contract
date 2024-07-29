@@ -2,14 +2,13 @@
   "name": "hardhat-project",
   "scripts": {
     "deploy": "hardhat run scripts/deploy.js --network swisstronik",
-    "set": "hardhat run scripts/setMessage.js --network swisstronik",
-    "get": "hardhat run scripts/getMessage.js --network swisstronik",
-    "mint": "hardhat run scripts/mint.js --network swisstronik",
-    "total": "hardhat run scripts/totalSupply.js --network swisstronik",
-    "transfer": "hardhat run scripts/transfer.js --network swisstronik"
+    "mint": "hardhat run scripts/mint.js --network swisstronik"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.6",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/hardhat-upgrades": "^3.2.0",
+    "ethers": "^6.13.2",
     "hardhat": "^2.22.6"
   },
   "dependencies": {

@@ -1,34 +1,65 @@
-const hre = require("hardhat");
-const { encryptDataField, decryptNodeResponse } = require("@swisstronik/utils");
+const { ethers, network } = require('hardhat');
+const { encryptDataField } = require('@swisstronik/utils');
+const fs = require('fs');
+const path = require('path');
 
-const sendShieldedTransaction = async (signer, destination, data, value) => {
-  const rpcLink = hre.network.config.url;
-  const [encryptedData] = await encryptDataField(rpcLink, data);
+const sendShieldedTransaction = async (
+  signer,
+  destination,
+  data,
+  value
+) => {
+  const rpclink = (network.config).url
+
+  const [encryptedData] = await encryptDataField(rpclink, data)
+
   return await signer.sendTransaction({
     from: signer.address,
     to: destination,
     data: encryptedData,
     value,
-  });
-};
+  })
+}
 
 async function main() {
-  const contractAddress = "0x8EEDDfeAcD015F7E4C1eEd59e2F66c8912C1FdEC";
-  const [signer] = await hre.ethers.getSigners();
-  const contractFactory = await hre.ethers.getContractFactory("TESTNFT");
-  const contract = contractFactory.attach(contractAddress);
-  const functionName = "mint100tokens";
-  const mint100TokensTx = await sendShieldedTransaction(
+  const contractAddress = '0x7d9cA90b9eFA5109658606F991B64dA51EbB9dd6'
+
+  const [signer] = await ethers.getSigners()
+
+  const contractFactory = await ethers.getContractFactory('PrivateNFT')
+  const contract = contractFactory.attach(contractAddress)
+
+  const mintFunctionName = 'mintNFT'
+  const recipientAddress = signer.address
+  const mintTx = await sendShieldedTransaction(
+    //@ts-ignore
     signer,
     contractAddress,
-    contract.interface.encodeFunctionData(functionName),
+    contract.interface.encodeFunctionData(mintFunctionName, [recipientAddress]),
     0
-  );
-  await mint100TokensTx.wait();
-  console.log("Transaction Receipt: ", `Minting token has been success! Transaction hash: https://explorer-evm.testnet.swisstronik.com/tx/${mint100TokensTx.hash}`);
+  )
+  const mintReceipt = await mintTx.wait()
+  console.log('Mint Transaction Hash: ', `https://explorer-evm.testnet.swisstronik.com/tx/${mintTx.hash}`)
+
+  const mintEvent = mintReceipt?.logs
+    .map((log) => {
+      try {
+        return contract.interface.parseLog(log)
+      } catch (e) {
+        return null
+      }
+    })
+    .find((event) => event && event.name === 'NFTMinted')
+  const tokenId = mintEvent?.args?.tokenId
+  console.log('Minted NFT ID: ', tokenId.toString())
+
+  const filePath = path.join(__dirname, '../utils/tx-hash.txt')
+  fs.writeFileSync(filePath, `NFT ID ${tokenId} : https://explorer-evm.testnet.swisstronik.com/tx/${mintTx.hash}\n`, {
+    flag: 'a',
+  })
 }
 
 main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  console.error(error)
+  process.exitCode = 1
+})

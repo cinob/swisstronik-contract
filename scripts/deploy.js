@@ -1,13 +1,25 @@
-const { ethers } = require("hardhat");
+const { ethers } = require('hardhat');
+const fs = require('fs');
+const path = require('path');
 
 async function main() {
-  const perc20 = await ethers.deployContract("TESTNFT");
-  await perc20.waitForDeployment();
+  const [signer] = await ethers.getSigners()
+  const initalOwner = signer.address
 
-  console.log(`deployed to ${perc20.target}`)
+  const Contract = await ethers.getContractFactory('PrivateNFT')
+
+  console.log('Deploying NFT...')
+  const contract = await Contract.deploy(initalOwner)
+
+  await contract.waitForDeployment()
+  const contractAddress = await contract.getAddress()
+
+  console.log('NFT deployed to:', contractAddress)
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })
